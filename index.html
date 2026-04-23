@@ -258,6 +258,78 @@
             btn.disabled = false;
             btn.innerText = 'Submit Data';
         }
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyG7oMCDPouD3hJaztRKrxMi57m3Ee_obj61rVuFez3ZNwpSyt2ylYytAmziA4sCX2DQQ/exec';
+
+    // 1. Setup Dropdowns
+    const districts = ["Kasargod", "Kannur", "Wayanad", "Kozhikode", "Malappuram", "Palakkad", "Thrissur", "Ernakulam", "Idukki", "Kottayam", "Alappuzha", "Pathanamthitta", "Kollam", "Thiruvananthapuram"];
+    districts.forEach(d => document.getElementById('districtSelect').add(new Option(d, d)));
+    
+    // Dynamic 100-year list
+    for(let y=1970; y<=2070; y++) {
+        let opt = new Option(y, y);
+        if(y === 2026) opt.selected = true; // Default to current year
+        document.getElementById('yearSelect').add(opt);
+    }
+
+    // 2. Real-time Eligibility Warning
+    const weightIn = document.getElementById('weightInput');
+    const dobIn = document.getElementById('dobInput');
+    const notice = document.getElementById('eligibilityNotice');
+    const noticeTxt = document.getElementById('eligibilityText');
+
+    function validateDonor() {
+        const weight = parseFloat(weightIn.value);
+        const dob = new Date(dobIn.value);
+        const age = new Date().getFullYear() - dob.getFullYear();
+
+        if (weight > 0 && weight < 45) {
+            notice.style.display = "block";
+            noticeTxt.innerText = "⚠ WEIGHT TOO LOW FOR DONATION (MIN 45KG)";
+        } else if (dobIn.value && age < 18) {
+            notice.style.display = "block";
+            noticeTxt.innerText = "⚠ MUST BE 18+ TO DONATE";
+        } else {
+            notice.style.display = "none";
+        }
+    }
+
+    weightIn.addEventListener('input', validateDonor);
+    dobIn.addEventListener('change', validateDonor);
+
+    // 3. Consolidated Form Submission
+    document.getElementById('bloodForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('subBtn');
+        const msg = document.getElementById('msg');
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        const currentYear = new Date().getFullYear();
+
+        // Alumni Logic Check
+        if (parseInt(data.passout) < currentYear) {
+            const confirmAlumni = confirm("System Alert: You have passed out. You will be marked 'Ineligible' for campus donation but saved in the alumni registry. Proceed?");
+            if (!confirmAlumni) return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "SYNCING TO REGISTRY...";
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(data)
+            });
+            msg.innerHTML = "<span style='color:#00ff00;'>✔ REGISTRATION SUCCESSFUL</span>";
+            e.target.reset();
+            notice.style.display = "none";
+        } catch (err) {
+            msg.innerHTML = "<span style='color:red;'>✖ CONNECTION ERROR. TRY AGAIN.</span>";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "REGISTER AS DONOR";
+        }
     });
 </script>
 </body>
