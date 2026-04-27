@@ -52,23 +52,30 @@
             box-shadow: 0 0 25px rgba(139, 0, 0, 0.3);
         }
 
-        label { font-weight: 600; margin-bottom: 5px; text-transform: uppercase; font-size: 0.75rem; }
+        /* Label Styling */
+        label { 
+            color: #ffffff; 
+            font-weight: 700; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            display: block;
+        }
 
         .form-control, .form-select { 
             background-color: var(--input-bg); border: 1px solid var(--white); 
             color: var(--white) !important; padding: 12px; 
         }
 
-        label { 
-        color: #ffffff; /* Change this hex code to choose your color */
-        font-weight: 700; 
-        margin-bottom: 5px; 
-        text-transform: uppercase; 
-        font-size: 0.85rem; 
-    }
-
         .form-control:focus, .form-select:focus { 
             background-color: #1a1a1a; border-color: var(--blood-red); box-shadow: 0 0 10px rgba(139, 0, 0, 0.6); 
+        }
+
+        /* Placeholder Styling */
+        .form-control::placeholder {
+            color: rgba(139, 0, 0, 0.6) !important; 
+            font-size: 0.8rem;
+            letter-spacing: 1px;
         }
 
         #eligibilityNotice {
@@ -132,7 +139,7 @@
 
             <div class="mb-3">
                 <label>Date of Birth</label>
-                <input type="date" name="dob" id="dobInput" class="form-control" placeholder="SELECT DATE OF BIRTH" required>
+                <input type="date" name="dob" id="dobInput" class="form-control" required>
             </div>
 
             <div id="eligibilityNotice" class="p-3 mb-3 text-center">
@@ -157,12 +164,12 @@
 
             <div class="mb-3">
                 <label>Department / College</label>
-                <input type="text" name="college" class="form-control" placeholder="DEPT.OF.[NAME],CUSAT" required>
+                <input type="text" name="college" class="form-control" placeholder="DEPT. OF STATISTICS, CUSAT" required>
             </div>
 
             <div class="mb-3">
                 <label>Expected Passing Date</label>
-                <input type="month" name="passout" id="passoutInput" class="form-control" placeholder="SELECT PASSING OUT YEAR" required>
+                <input type="month" name="passout" id="passoutInput" class="form-control" required>
             </div>
 
             <button type="submit" class="btn btn-submit w-100" id="subBtn">REGISTER AS DONOR</button>
@@ -176,7 +183,10 @@
 
     // 1. Setup Districts
     const districts = ["Kasargod", "Kannur", "Wayanad", "Kozhikode", "Malappuram", "Palakkad", "Thrissur", "Ernakulam", "Idukki", "Kottayam", "Alappuzha", "Pathanamthitta", "Kollam", "Thiruvananthapuram"];
-    districts.forEach(d => document.getElementById('districtSelect').add(new Option(d, d)));
+    const districtSelect = document.getElementById('districtSelect');
+    districts.forEach(d => {
+        districtSelect.add(new Option(d, d));
+    });
 
     // 2. Real-time Eligibility Warning
     const weightIn = document.getElementById('weightInput');
@@ -225,28 +235,6 @@
         btn.disabled = true;
         btn.innerText = "SYNCING TO REGISTRY...";
 
-        /* This targets the placeholder text in all inputs and selects */
-.form-control::placeholder {
-    color: rgba(139, 0, 0, 0.5); /* White at 40% opacity */
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-}
-
-/* For older browsers (Firefox/Internet Explorer) */
-.form-control::-webkit-input-placeholder { color: rgba(255, 0, 0, 0.4); }
-.form-control::-moz-placeholder { color: rgba(255, 0, 0, 0.4); }
-
-    
-
-    label { 
-        color: #ffffff; /* Change this hex code to choose your color */
-        font-weight: 700; 
-        margin-bottom: 5px; 
-        text-transform: uppercase; 
-        font-size: 0.85rem; 
-    }
-
-    
         try {
             await fetch(API_URL, {
                 method: 'POST', 
@@ -258,6 +246,15 @@
             notice.style.display = "none";
         } catch (err) {
             msg.innerHTML = "<span style='color:red;'>✖ CONNECTION ERROR. TRY AGAIN.</span>";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "REGISTER AS DONOR";
+        }
+    });
+</script>
+</body>
+</html>
+GAIN.</span>";
         } finally {
             btn.disabled = false;
             btn.innerText = "REGISTER AS DONOR";
