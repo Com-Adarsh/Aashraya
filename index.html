@@ -199,7 +199,7 @@
         const dob = new Date(dobIn.value);
         const age = new Date().getFullYear() - dob.getFullYear();
 
-        if (weight > 0 && weight < 45) {
+        if (weight > 0 && weight < 40) {
             notice.style.display = "block";
             noticeTxt.innerText = "⚠ WEIGHT TOO LOW FOR DONATION (MIN 45KG)";
         } else if (dobIn.value && age < 18) {
